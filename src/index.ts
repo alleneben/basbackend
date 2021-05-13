@@ -1,3 +1,4 @@
+
 import express from "express"
 import dotenv from "dotenv"
 import "reflect-metadata"
@@ -5,36 +6,52 @@ import cookieParser from "cookie-parser"
 import session from "express-session"
 
 
-
-import bas from './routes/bas';
-import { DB } from  './db/db';
-
-
-dotenv.config();
+import bas from './routes/bas'
+import { DB } from  './db/db'
 
 
+dotenv.config()
 
-const app = express()
-const port = 3000
 
-app.use(express.json());
-        app.use(express.urlencoded({ extended: true }));
-        app.use(cookieParser())
-        app.use(session({ 
+
+class Server {
+    private app: express.Express;
+    private db: any;
+    private port: number = 3000;
+    constructor(){
+        this.app = express()
+        this.db = new DB()
+        this.app.use(express.json());
+        this.app.use(express.urlencoded({ extended: true }));
+        this.app.use(cookieParser())
+        this.app.use(session({ 
             secret: process.env.SESSION_SECRET_KEY || "",
             resave: false,
             saveUninitialized: false,
             cookie: {
                 maxAge: 30 * 24 * 60 * 60,
-                httpOnly: true
+                path: '/'
             }
         }))
-const db = new DB()
-app.use('/api/v1/',bas)
+
+        this.setRoutes()
+    }
 
 
+    private setRoutes(){
+        this.app.use('/', express.static(__dirname))
+        this.app.use('/api/v1/',bas)
+    }
 
-app.listen(3000, () => {
-    // tslint:disable-next-line:no-console
-    console.log(`Server is running at http://localhost:${port}`);
-})
+
+    public start(){
+        this.app.listen(this.port, () => {
+            // tslint:disable-next-line:no-console
+            console.log(`Server is running at http://localhost:${this.port}`)
+        })
+    }
+}
+
+const server = new Server()
+server.start()
+ 
