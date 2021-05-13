@@ -1,10 +1,15 @@
 import { getRepository } from "typeorm";
-import { Users } from '../models/users';
+import { Users, Providers } from '../models/users';
 
 
 export class UserController {
 
-    getAll(){
-        return getRepository(Users).findOne(1);
+    getUsers(param: object){
+
+        return getRepository(Users).find(param);
     }
+
+    getProviders(param: object){
+        return getRepository(Providers).find(param);
+    } 
 }

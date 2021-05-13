@@ -1,7 +1,7 @@
 import { ConnectionOptions, createConnection, Connection } from "typeorm";
 import dotenv from "dotenv"
 
-import {Users} from "../models/users";
+import {Users, Providers} from "../models/users";
 
 
 dotenv.config();
@@ -17,7 +17,7 @@ const DB_CONFIG: ConnectionOptions = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB,
-    entities: [Users]
+    entities: [Users, Providers]
 }
 
 export class DB {

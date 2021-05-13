@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as express from 'express';
 
 import { UserController } from "../controllers/user";
+import { checkAccess } from '../utils/auth';
 
 class Bas {
     router: Router;
@@ -14,18 +15,46 @@ class Bas {
     }
 
     private createRoutes(){
-        let b = "akoko is troublesome".split(" ")
-
-        this.router.get("/", this.test)
+        this.router.get("/", checkAccess,this.getroot)
+        this.router.get("/users", checkAccess, this.users)
+        this.router.get("/providers", checkAccess, this.providers)
     }
 
-    test = async (req:any,res:any) => {
+    getroot = async (req: any, res:any) => {
+        const oneDayToSeconds = 2 * 24 * 60 * 60 * 1000;
+    
+        res.cookie("_basInit", 'token', {maxAge: oneDayToSeconds,httpOnly: false})
+        res.status(200).send({success: true, message: 'Server running...'})
+    }
+
+    signin = async (req:any,res:any) => {
+        const oneDayToSeconds = 2 * 24 * 60 * 60 * 1000;
+        res.cookie("_basAuth", 'token', {maxAge: oneDayToSeconds,httpOnly: false})
+        res.status(200).send({success: true})
+    }
+    
+    signup = async (req:any,res:any) => {
+
+    }
+
+    activateuser = async (req:any, res:any) => {
+
+    }
+
+    users = async (req:any,res:any) => {
         const user = new UserController()
 
-        console.log(await user.getAll());
+        const param = req.body
+
+        res.status(200).send({success: true, data: await user.getUsers(param)});
+    }
+
+    providers = async (req:any, res:any) => {
+        const providers = new UserController()
         
-        
-        res.status(200).send({user:await user.getAll()});
+        const param = req.body
+
+        res.status(200).send({success: true, data: await providers.getProviders(param)})
     }
 
 }
